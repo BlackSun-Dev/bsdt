@@ -1,5 +1,10 @@
 <?php
-session_start();
+if(!isset($_SESSION)) {
+  session_start();
+} else {
+  session_destroy();
+  session_start();
+}
 ?>
 <html lang="en" dir="ltr">
 <head>
@@ -38,9 +43,9 @@ session_start();
             <input type="submit" value="Login" name="login" class="button ui-corner-all dropShadow center">
           </div><!-- .buttons -->
           <br/>
-            <div class="section-text">
-              Copyright <?php echo date('Y'); ?> - Black Sun a <a href="http://swcombine.com">Star Wars Combine</a> faction.
-            </div>
+          <div class="section-text">
+            Copyright <?php echo date('Y'); ?> - Black Sun a <a href="http://swcombine.com">Star Wars Combine</a> faction.
+          </div>
         </form>
       </div><!-- .body -->
     </div><!-- .container -->

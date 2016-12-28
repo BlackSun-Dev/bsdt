@@ -1,8 +1,8 @@
 <?php
 require_once "lib/autoloader.php";
-
+session_start();
 $users = new User;
-$permissionLevel = isset($_SESSION['userId']) ? $users->getPermissionLevel($_SESSION['userId']) : null;
+$permissionLevel = isset($_SESSION['userLevel']) ? $_SESSION['userLevel'] : null;
 ?>
 
 <div id="menuRight">
