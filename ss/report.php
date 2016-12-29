@@ -1,32 +1,21 @@
 <?php
-	//error_reporting(E_ERROR);
-    require "scripts/php/req.conn.php";
+include('../layout.php');
+head();
 
-    include "scripts/php/fnc.myFunctions.php";
-    include "scripts/php/fnc.progSpecific.php";
-    include "scripts/php/fnc.xml2Array.php";
-
-	include "../lib/style/header.php";
 
 	if (isset($_SESSION['userPermissions']['report']) == 1) {
 		$_POST['reportPanel'] = 1;
 	}
 ?>
 
-<body>
-	<?php
-		include "/menu.php";
-		include "lib/style/logo.php";
-	?>
-	
 	<div class="contentContainer center">
 		<div class="mainContent ui-corner-all dropShadow center textCenter">
 			<div class="textRight" style="position: absolute; top: 10px; right: 15px;"><span class="alert"><?php echo $_SESSION['currentVersion']; ?></span></div>
-			
+
 			<div style="width: 100%;" class="textLeft">
 				<h3>Current Scans</h3>
 			</div>
-			
+
 			<hr class="left">
 			<div id="reportContainer">
 				<?php if (isset($_SESSION['userPermissions']) && $_SESSION['userPermissions']['report'] == 1) { ?>
@@ -42,7 +31,7 @@
 // Define functions
 	function report() {
 		smoothToTop();
-		
+
 		var time = $('#time').val();
 		var selectSystem = $('#selectSystem').val();
 		var displayType = $('input[type="radio"][name="displayType"]:checked').val();
@@ -53,7 +42,7 @@
 		$.ajax({
 			type: "POST",
 			url: "processReport",
-			data: { 
+			data: {
 				time: time,
 				system: selectSystem,
 				display: displayType,

@@ -1,24 +1,14 @@
 <?php
 	//error_reporting(E_ERROR);
-    require "scripts/php/req.conn.php";
-
-    include "scripts/php/fnc.myFunctions.php";
-    include "scripts/php/fnc.progSpecific.php";
-    include "scripts/php/fnc.xml2Array.php";
+  include('../layout.php');
+  head();
 
 	if (isset($_SESSION['userPermissions']['report']) == 1) {
 		$_POST['historyPanel'] = 1;
 	}
 
-	include "../lib/style/header.php";
+	include PATH_ROOT."../lib/style/header.php";
 ?>
-
-<body>
-	<?php
-		include "/menu.php";
-		include "lib/style/logo.php";
-	?>
-	
 	<div class="contentContainer center">
 		<div class="mainContent ui-corner-all dropShadow center textCenter">
 			<div class="textRight" style="position: absolute; top: 10px; right: 15px;"><span class="alert"><?php echo $_SESSION['currentVersion']; ?></span></div>
@@ -46,7 +36,7 @@
 		$.ajax({
 			type: "POST",
 			url: "processHistory",
-			data: { 
+			data: {
 				system: selectSystem,
 			},
 			dataType: "JSON",

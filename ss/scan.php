@@ -1,19 +1,12 @@
 <?php
-    require "scripts/php/req.conn.php";
+include('../layout.php');
+head();
 
     include "scripts/php/fnc.myFunctions.php";
     include "scripts/php/fnc.progSpecific.php";
     include "scripts/php/fnc.xml2Array.php";
 
-	include "../lib/style/header.php";
 ?>
-
-<body>
-	<?php
-		include "/menu.php";
-		include "lib/style/logo.php";
-	?>
-	
 	<div class="contentContainer center">
 		<div class="mainContent ui-corner-all textCenter center dropShadow" id="reportContainer">
 			<div class="textRight" style="position: absolute; top: 10px; right: 15px;"><span class="alert"><?php echo $_SESSION['currentVersion']; ?></span></div>

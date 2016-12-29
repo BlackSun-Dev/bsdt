@@ -21,7 +21,7 @@ if(!$installed){
 		$username = $_POST['username'];
 
 	  $query = $mysqli->stmt_init();
-		if($query -> prepare('INSERT INTO `users` (`userHandle`, `userPass`, `userGroup`, `userLevel`) VALUES(?, ?, 0, 2)')){
+		if($query -> prepare('INSERT INTO `users` (`userHandle`, `userPass`, `userGroup`, `userLevel`) VALUES(?, ?, 0, 4)')){
 			$query -> bind_param("ss", $username, $password);
 			$query -> execute();
 			$mysqli->close();

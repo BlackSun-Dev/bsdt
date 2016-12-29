@@ -11,8 +11,8 @@ if(!isset($_SESSION)) {
   <title>BSDT - Login</title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
   <meta name="viewport" content="initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <link rel="stylesheet" type="text/css" href="lib/style/login-style.css"/>
-  <link href="lib/style/custom-theme/jquery-ui-1.10.3.custom.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" type="text/css" href="style/login-style.css"/>
+  <link href="style/custom-theme/jquery-ui-1.10.3.custom.css" rel="stylesheet" type="text/css">
 </head>
 <body onload="setFocus()">
   <div class="container signin">
