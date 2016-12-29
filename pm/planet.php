@@ -8,7 +8,7 @@ $planetId = isset($_REQUEST['id']) ? $_REQUEST['id'] : null;
 ?>
   <div class="contentContainer center">
     <div class="mainContent ui-corner-all dropShadow center textCenter">
-      <div class="textRight" style="position: absolute; top: 10px; right: 15px;"><span class="alert"><?php echo $_SESSION['currentVersion']; ?></span></div>
+      <div class="textRight" style="position: absolute; top: 10px; right: 15px;"><span class="alert"><?php echo SYSTEM_VERSION; ?></span></div>
 
       <div style="width: 100%;" class="textLeft">
         <h3><?php if(isset($planetId)){ echo $planets->getPlanetName($planetId) . " - "; } ?>Planet Details</h3>

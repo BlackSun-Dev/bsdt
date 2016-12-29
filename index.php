@@ -2,6 +2,7 @@
 include("layout.php");
 
 head();
+
 if (!isset($_SESSION['userId'])) {
 	header("Location: login");
 }
@@ -9,7 +10,7 @@ if (!isset($_SESSION['userId'])) {
 
 <div class="contentContainer center">
 	<div class="mainContent ui-corner-all dropShadow textLeft">
-		<div class="textRight" style="position: absolute; top: 10px; right: 15px;"><span class="alert">v1.0</span></div>
+		<div class="textRight" style="position: absolute; top: 10px; right: 15px;"><span class="alert"><?php echo SYSTEM_VERSION; ?></span></div>
 		<h3>Information</h3>
 		<hr class="left">
 		<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras purus tellus, fermentum at lacus et, dignissim finibus velit. Nullam eleifend ex non semper pretium. Cras ullamcorper, mi eu ultrices egestas, massa risus vestibulum diam, sit amet eleifend augue nunc eget sem. Proin sit amet elit lacus. Ut tempor, lorem non porttitor aliquam, felis neque elementum ante, in elementum sapien neque ut dolor. Cras eget pharetra leo. Nullam cursus velit lobortis accumsan facilisis. Nulla sit amet velit tincidunt, rhoncus urna a, pharetra est. Mauris vitae nunc rhoncus quam facilisis tincidunt. Quisque erat nisl, mollis sed odio a, interdum semper ante. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.

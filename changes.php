@@ -23,10 +23,10 @@
 	
 	<div class="contentContainer center">
 		<div id="reportContainer" class="mainContent ui-corner-all dropShadow center textCenter">
-			<div class="textRight" style="position: absolute; top: 10px; right: 15px;"><span class="alert"><?php echo $_SESSION['currentVersion']; ?></span></div>
+			<div class="textRight" style="position: absolute; top: 10px; right: 15px;"><span class="alert"><?php echo SYSTEM_VERSION; ?></span></div>
 			<h3>Entity History</h3>
 			<hr class="left">
-		<?php if (isset($_SESSION['userPermissions']) && $_SESSION['userPermissions']['report'] == 1) { ?>
+		<?php if ($permissionLevel >= 4)  { ?>
 		
 		<div id="tabHolder">
 			<div id="tabBasic" class="floatLeft tab tabActive ui-corner-top" onClick="activeTab('Basic', 'Focus');">Entity History</div>

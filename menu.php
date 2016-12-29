@@ -1,21 +1,23 @@
 <?php
 $users = new User;
-$permissionLevel = isset($_SESSION['userLevel']) ? $_SESSION['userLevel'] : null;
+$permissionLevel = isset($_SESSION['userId']) ? $users->getPermissionLevel($_SESSION['userId']) : null;
 $urlPath = $_SERVER["HTTP_HOST"].'/bsdt';
-
+if($users->isBanned($_SESSION['userId'])){
+	header("Location: banned");
+}
 ?>
 
 <div id="menuRight">
 	<div id="menuInformation">
-		<div class="menuHeader ui-corner-top dropShadow">
-			<span class="menuHeader">Information</span>
-		</div>
-		<div class="menuContent textCenter dropShadow ui-corner-bottom">
-			<?php if (isset($_SESSION['userId'])) { ?>
+		<div class="menuContent dropShadow ui-corner-all">
+			<span class="menuHeader">Information</span><hr>
+			<div class="textCenter">
+			<?php
+			if (isset($_SESSION['userId'])) { ?>
 				Logged in as:<br />
 				<span style="color: #FFF;"><?php echo $_SESSION['username']; ?></span><br />
 
-				<form method="POST" action="logout.php">
+				<form method="POST" action="http://<?php echo $urlPath; ?>/logout.php">
 					<input type="submit" value="Logout" name="logout" class="button ui-corner-all dropShadow center">
 				</form>
 				<?php } else { ?>
@@ -26,12 +28,8 @@ $urlPath = $_SERVER["HTTP_HOST"].'/bsdt';
 					</form>
 					<?php } ?>
 				</div>
-			</div>
-			<div class="menuSection dropShadow">
-				<div class="menuHeader ui-corner-top">
-					<span class="menuHeader">Navigation</span>
-				</div>
-				<div class="menuContent dropShadow ui-corner-bottom">
+			<?php if (isset($_SESSION['userId'])) { ?>
+					<span class="menuHeader">Navigation</span><hr>
 					<a href="http://<?php echo $urlPath; ?>/index">Home</a><br />
 					<?php if ($permissionLevel >= $users->permissionIndex("Consiglio")) { ?>
 						<a href="http://<?php echo $urlPath; ?>/admin/userManagement">User Management</a><br />
@@ -39,19 +37,16 @@ $urlPath = $_SERVER["HTTP_HOST"].'/bsdt';
 							<a href="http://<?php echo $urlPath; ?>/admin/scrubDatabase">Scrub Database</a><br />
 							<?php } if ($permissionLevel >= $users->permissionIndex("Vigo")) { ?>
 								<a href="http://<?php echo $urlPath; ?>/admin/groupManagement">Group Management</a><br />
-								<?php } if (isset($_SESSION['userId'])) { ?>
-									<a href="http://<?php echo $urlPath; ?>/changePassword">Change Password</a>
-									<hr>
+								<?php } ?>
+									<a href="http://<?php echo $urlPath; ?>/changePassword">Change Password</a><br/>
+									<br/><span class="menuHeader">Scanning</span><hr>
 									<a href="http://<?php echo $urlPath; ?>/ss/scan">Submit Scan</a><br />
-									<?php } if ($permissionLevel >= $users->permissionIndex("Assistant")) { ?>
+									<?php if ($permissionLevel >= $users->permissionIndex("Assistant")) { ?>
 										<a href="http://<?php echo $urlPath; ?>/ss/report">Current Scans</a><br />
 										<a href="http://<?php echo $urlPath; ?>/ss/history">System History</a><br />
-										<hr>
 										<a href="http://<?php echo $urlPath; ?>/ss/entitySearch">Entity Search</a><br />
-										<?php } ?>
-										<div class="menuHeader ui-corner-top">
-											<span class="menuHeader">Prospecting</span>
-										</div>
+									<?php } ?><br/>
+										<span class="menuHeader">Prospecting</span><hr>
 										<?php if($permissionLevel >= $users->permissionIndex("Consiglio")){ ?>
 											<a href="http://<?php echo $urlPath; ?>/pm">Systems Management</a><br/>
 											<a href="http://<?php echo $urlPath; ?>/pm">Planets Management</a><br/>
@@ -59,16 +54,15 @@ $urlPath = $_SERVER["HTTP_HOST"].'/bsdt';
 											<a href="http://<?php echo $urlPath; ?>/pm">Add Deposits XML</a><br/>
 										</div>
 									</div>
-
+<?php } ?>
 									<?php if ($permissionLevel >= $users->permissionIndex("User")) { ?>
+										<br />
 										<div class="menuSection dropShadow">
-											<div class="menuHeader ui-corner-top">
-												<span class="menuHeader">Control</span>
-											</div>
-
-											<div class="menuContent ui-corner-bottom textCenter dropShadow">
+											<div class="menuContent ui-corner-all dropShadow">
+												<span class="menuHeader">Control</span><hr>
+												<div class="textCenter">
 												<select id="selectSystem" class="dropShadow formField ui-corner-all" style="width: 95%">
-													<?php echo $systemList; ?>
+													<?php //echo $systemList; ?>
 												</select>
 
 												<br />
@@ -122,6 +116,7 @@ $urlPath = $_SERVER["HTTP_HOST"].'/bsdt';
 											<br /><br />-->
 
 											<button class="button ui-corner-all dropShadow center" onClick="report();">Run Report</button>
+										</div>
 										</div>
 									</div>
 									<?php

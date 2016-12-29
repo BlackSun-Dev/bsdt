@@ -1,8 +1,6 @@
 <?php
-require "lib/autoloader.php";
-
-include "lib/style/header.php";
-include "lib/style/logo.php";
+include("layout.php");
+head("Install");
 
 $success = false;
 $installed = Database::installCheck();
@@ -21,7 +19,7 @@ if(!$installed){
 		$username = $_POST['username'];
 
 	  $query = $mysqli->stmt_init();
-		if($query -> prepare('INSERT INTO `users` (`userHandle`, `userPass`, `userGroup`, `userLevel`) VALUES(?, ?, 0, 4)')){
+		if($query -> prepare('INSERT INTO `users` (`userHandle`, `userPass`, `userGroup`, `userLevel`) VALUES(?, ?, 0, 5)')){
 			$query -> bind_param("ss", $username, $password);
 			$query -> execute();
 			$mysqli->close();
@@ -48,10 +46,8 @@ if(!$installed){
 				<div class="mainContent ui-corner-all dropShadow center textCenter">
 					<div class="textLeft" style="width: 100%;"><h3>BSDT Install</h3></div>
 					<hr class="left">
-					<ol>
-						<li>Create a user with full admin priviledges. Database credentials need to be completed manually.</li>
+						<p>Create a user with full admin priviledges. Database credentials need to be completed manually.</p>
 
-						<li>Fill out form below and click "Install"<br><br>
 							<form method="POST" action="install.php">
 								<div style="width: 325px;" class="center textRight">
 									Admin Username: <input type="text" name="username" value="Admin Username" class="formField ui-corner-all dropShadow" onfocus="formFocus(this);" onblur="formBlur(this);"><br />
@@ -59,8 +55,6 @@ if(!$installed){
 								</div>
 								<input type="submit" value="Install" name="install" class="button ui-corner-all dropShadow">
 							</form>
-						</li>
-					</ol>
 				</div>
 			</div>
 			<?php

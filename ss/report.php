@@ -1,16 +1,18 @@
 <?php
 include('../layout.php');
-head();
+head("System Scans");
 
+$users = new User;
+$permissionLevel = isset($_SESSION['userId']) ? $users->getPermissionLevel($_SESSION['userId']) : null;
 
-	if (isset($_SESSION['userPermissions']['report']) == 1) {
+	if (isset($permissionLevel) >= 4) {
 		$_POST['reportPanel'] = 1;
 	}
 ?>
 
 	<div class="contentContainer center">
 		<div class="mainContent ui-corner-all dropShadow center textCenter">
-			<div class="textRight" style="position: absolute; top: 10px; right: 15px;"><span class="alert"><?php echo $_SESSION['currentVersion']; ?></span></div>
+			<div class="textRight" style="position: absolute; top: 10px; right: 15px;"><span class="alert"><?php echo SYSTEM_VERSION; ?></span></div>
 
 			<div style="width: 100%;" class="textLeft">
 				<h3>Current Scans</h3>
@@ -18,7 +20,7 @@ head();
 
 			<hr class="left">
 			<div id="reportContainer">
-				<?php if (isset($_SESSION['userPermissions']) && $_SESSION['userPermissions']['report'] == 1) { ?>
+				<?php if ($permissionLevel >= 4)  { ?>
 					<span class="alert">Use the control panel to filter and generate a report of the most recent scans.</span>
 				<?php } else { ?>
 					<span class="alert">You are not authorized to view this page.</span>

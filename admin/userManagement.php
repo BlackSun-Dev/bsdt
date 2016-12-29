@@ -1,14 +1,20 @@
 <?php
-    require "scripts/php/req.conn.php";
+include('../layout.php');
+head("User Management");
 
-    include "scripts/php/fnc.myFunctions.php";
-    include "scripts/php/fnc.progSpecific.php";
-    include "scripts/php/fnc.xml2Array.php";
+$users = new User;
+$permissionLevel = isset($_SESSION['userId']) ? $users->getPermissionLevel($_SESSION['userId']) : null;
+$mysqli = Database::getInstance();
 
-	if (isset($_SESSION['userPermissions']['groupAdmin']) == 1) {
+
+if (isset($_POST['mode']) == 'new') {
+	$users->addUser($_POST['username'], $_POST['password'], $_POST['newUserGroup'], $_POST['newUserLevel']);
+}
+
+	if ($permissionLevel >= 4) {
 	// Gets all the group information to populate user's group fields
-		$stmt = $mysqli -> prepare("SELECT `GroupID`, `GroupName`, `Systems` FROM `groups` ORDER BY `GroupName`");
-			echo $mysqli -> error;
+		$stmt = $mysqli->prepare("SELECT `GroupID`, `GroupName`, `Systems` FROM `groups` ORDER BY `GroupName`");
+			echo $mysqli->error;
 		$stmt -> execute();
 		$stmt -> store_result();
 		$stmt -> bind_result($stmt_GroupID, $stmt_GroupName, $stmt_Systems);
@@ -32,8 +38,8 @@
 			$groupsList .= '<option value="' . $groups[$key]['GroupID'] . '">' . $groups[$key]['GroupName'] . '</option>';
 		}
 
-		$stmt = $mysqli -> prepare("SELECT `IndexNo`, `Username`, `Group`, `Permissions` FROM `users` WHERE `IndexNo` <> ? ORDER BY `Username`");
-			echo $mysqli -> error;
+		$stmt = $mysqli->prepare("SELECT `userId`, `userHandle`, `userGroup`, `userLevel` FROM `users` WHERE `userId` <> ? ORDER BY `userHandle`");
+			echo $mysqli->error;
 		$stmt -> bind_param('s', $_SESSION['userIndex']);
 		$stmt -> execute();
 		$stmt -> store_result();
@@ -108,7 +114,7 @@
 					$inGroup = 0;
 				}
 
-				if (($inGroup == 1) || (isset($_SESSION['userPermissions']) && ($_SESSION['userPermissions']['owner'] == 1 || $_SESSION['userPermissions']['admin'] == 1))) {
+				if (($inGroup == 1) || ($permissionLevel >=4)) {
 					if ($basicRowCount % 2 == 0) {
 						$basicList .= '<tr class="even">';
 					} else {
@@ -132,49 +138,44 @@
 	}
 
 // Does checks on permissions to keep the tabs displaying properly
-	if (isset($_SESSION['userPermissions']['owner']) == 1) {
+	if ($permissionLevel >= 5) {
 		$tabPercent = 24;
-	} else if ($_SESSION['userPermissions']['admin'] == 1) {
+	} else if ($permissionLevel >=4) {
 		$tabPercent = 32;
 	} else {
 		$tabPercent = 49;
 	}
 
-	include "../lib/style/header.php";
-?>
-
-<body>
-	<?php
-		include "/menu.php";
-		include "lib/style/logo.php";
 	?>
 
 	<div class="contentContainer center">
 		<div class="mainContent ui-corner-all dropShadow center textLeft">
-			<div class="textCenter" style="position: absolute; top: 10px; right: 15px;"><span class="alert"><?php echo $_SESSION['currentVersion']; ?></span></div>
+			<div class="textCenter" style="position: absolute; top: 10px; right: 15px;"><span class="alert"><?php echo SYSTEM_VERSION; ?></span></div>
 			<h3>User Management</h3>
 			<hr class="left">
-		<?php if (isset($_SESSION['userPermissions']['groupAdmin']) == 1) { ?>
+		<?php if ($permissionLevel >= 4) { ?>
 			<div style="float: left; width: 35%" class="textCenter">
 				<div class="textLeft" style="width: 100%">New Account</div>
 				<hr>
 
-				<form method="POST" action="processUsers">
+				<form method="POST" action="userManagement">
 					<input type="hidden" name="mode" value="new">
-					<input type="text" name="userName" value="Username" class="userManagement formField ui-corner-all dropShadow" onfocus="formFocus(this);" onblur="formBlur(this);"><br />
-					<input type="text" name="password" value="Temp. Password" class="userManagement formField ui-corner-all dropShadow" onfocus="formFocus(this);" onblur="formBlur(this);"><br />
-					<select id="newUserPrivs" name="newUserPrivs" class="dropShadow userManagement formField ui-corner-all">
-						<?php if (isset($_SESSION['userPermissions']['owner']) == 1) { ?>
-							<option value="0,1,1,1">Assign Admin</option>
-						<?php } if (isset($_SESSION['userPermissions']['admin']) == 1) { ?>
-							<option value="0,0,1,1">Assign Group Admin</option>
+					<input type="text" name="username" placeholder="Handle" class="userManagement formField ui-corner-all dropShadow" onfocus="formFocus(this);" onblur="formBlur(this);"><br />
+					<input type="password" name="password" placeholder="Temp Password" class="userManagement formField ui-corner-all dropShadow" onfocus="formFocus(this);" onblur="formBlur(this);"><br />
+					<select id="newUserPrivs" name="newUserLevel" class="dropShadow userManagement formField ui-corner-all">
+						<option value="" disabled selected>Set user permissions</option>
+						<?php if ($permissionLevel >= 5) { ?>
+							<option value="4">Assign Vigo</option>
+						<?php } if ($permissionLevel >= 4) { ?>
+							<option value="3">Assign Consigliere</option>
 						<?php } ?>
-						<option value="0,0,0,1">Assign Reports</option>
-						<option value="0,0,0,0" selected>Assign General Privs</option>
+						<option value="2">Assign Faction Assistant</option>
+						<option value="1">Assign General User</option>
 					</select><br />
 
-					<?php if (isset($_SESSION['userPermissions']['owner']) == 1 || isset($_SESSION['userPermissions']['admin']) == 1) { ?>
+					<?php if ($permissionLevel >= 4) { ?>
 						<select id="newUserGroup" name="newUserGroup" class="dropShadow userManagement formField ui-corner-all">
+							<option value="" disabled selected>Set user group</option>
 							<?php echo $groupsList; ?>
 						</select><br id="newUserGroupBreak" />
 					<?php } else { ?>
@@ -190,13 +191,13 @@
 			</div>
 
 			<div style="float: right; width: 65%" class="textCenter">
-				<form method="POST" action="processUsers">
+				<form method="POST" action="userManagement.php">
 					<input type="hidden" name="mode" value="update">
-					<?php if (isset($_SESSION['userPermissions']['owner']) == 1) { ?>
+					<?php if ($permissionLevel >= 5) { ?>
 						<div class="tab ui-corner-top" id="adminTab" tabLink="adminDisplay" style="width: <?php echo $tabPercent; ?>%;">Admin</div>
 					<?php } ?>
 
-					<?php if (isset($_SESSION['userPermissions']['admin']) == 1) { ?>
+					<?php if ($permissionLevel >= 4) { ?>
 						<div class="tab ui-corner-top" id="groupAdminTab" tabLink="groupAdminDisplay" style="width: <?php echo $tabPercent; ?>%;">Group Admin</div>
 					<?php } ?>
 
@@ -206,13 +207,13 @@
 
 					<div class="clear"></div>
 
-					<?php if (isset($_SESSION['userPermissions']['owner']) == 1) { ?>
+					<?php if ($permissionLevel >= 5) { ?>
 						<div id="adminDisplay" style="display: none;" class="tabDisplay">
 							<?php echo $adminList; ?>
 						</div>
 					<?php } ?>
 
-					<?php if (isset($_SESSION['userPermissions']['admin']) == 1) { ?>
+					<?php if ($permissionLevel >= 4) { ?>
 						<div id="groupAdminDisplay" style="display: none;" class="tabDisplay">
 							<?php echo $groupAdminList; ?>
 						</div>
@@ -228,13 +229,13 @@
                     <div>
     					<!--<div class="dropShadow ui-corner-all" data-shadowFor="userAction"></div>-->
     					<select id="userAction" name="actions" class="dropShadow formField ui-corner-all">
-    						<?php if (isset($_SESSION['userPermissions']['owner']) == 1) { ?>
+    						<?php if ($permissionLevel >= 5) { ?>
     							<option value="transfer">Transfer Ownership</option>
     							<option value="0,1,1,1">Assign Admin</option>
-    						<?php } if (isset($_SESSION['userPermissions']['admin']) == 1) { ?>
+    						<?php } if ($permissionLevel >= 4) { ?>
     							<option value="0,0,1,1">Assign Group Admin</option>
     						<?php } ?>
-    						<?php if (isset($_SESSION['userPermissions']['owner']) == 1 || isset($_SESSION['userPermissions']['admin']) == 1) { ?>
+    						<?php if ($permissionLevel >= 4) { ?>
     							<option value="group">Assign Group</option>
     						<?php } ?>
     						<option value="0,0,0,1">Assign Reports</option>

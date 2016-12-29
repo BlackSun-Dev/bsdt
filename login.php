@@ -1,11 +1,21 @@
 <?php
+require_once "lib/autoloader.php";
+
 if(!isset($_SESSION)) {
   session_start();
 } else {
   session_destroy();
   session_start();
 }
+
+if(isset($_POST['login'])){
+  $users = new User;
+  $users->login($_POST['username'], $_POST['password']);
+  header("Location: index");
+}
+
 ?>
+
 <html lang="en" dir="ltr">
 <head>
   <title>BSDT - Login</title>
@@ -19,35 +29,29 @@ if(!isset($_SESSION)) {
     <div class="login-header ui-corner-top">
       BSDT Login
     </div>
-    <!-- .header -->
     <div class="body-container ui-corner-bottom">
       <div>
-        <form method="POST" action="process-login.php">
-          <div class="messages">
-
-          </div>
-
+        <form method="POST" action="login.php">
+          <div class="messages"></div>
           <div class="input-container">
-            <input id="username" class="formField" type="text" name="username" placeholder="Username" /><!---->
+            <input id="username" class="formField" type="text" name="username" placeholder="Handle" />
           </div>
-
           <div class="input-container">
             <input id="password" class="formField" type="password" name="password"  placeholder="Password" />
           </div>
-
           <div class="section-text" style="font-size: 16px;">
             For access or a password reset, see your Commanding Officer.
           </div>
           <br/>
           <div class="buttons">
             <input type="submit" value="Login" name="login" class="button ui-corner-all dropShadow center">
-          </div><!-- .buttons -->
+          </div>
           <br/>
           <div class="section-text">
             Copyright <?php echo date('Y'); ?> - Black Sun a <a href="http://swcombine.com">Star Wars Combine</a> faction.
           </div>
         </form>
-      </div><!-- .body -->
-    </div><!-- .container -->
+      </div>
+    </div>
   </body>
   </html>

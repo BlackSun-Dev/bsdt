@@ -64,8 +64,11 @@ CREATE TABLE IF NOT EXISTS `groups` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1;
 
 INSERT INTO `groups` (`GroupID`, `GroupName`, `Systems`) VALUES
-(1, "No Group", "(Default Group)"),
-(2, "Unknown", "Unknown");
+(1, "Family Council", "(Default Group)"),
+(2, "Consiglio", "Unknown"),
+(3, "Blades", "(Default Group)"),
+(4, "Shobquix", "Unknown"),
+(5, "Gesenix", "Unknown");
 
 CREATE TABLE IF NOT EXISTS `scansbasic` (
   `years` mediumint(4) NOT NULL,
@@ -128,5 +131,6 @@ CREATE TABLE IF NOT EXISTS `users` (
   `userPass` text NOT NULL,
   `userGroup` int(2) DEFAULT NULL,
   `userLevel` int(2) NOT NULL,
+  `isBanned` boolean NOT NULL DEFAULT 0,
   PRIMARY KEY (`userId`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1;

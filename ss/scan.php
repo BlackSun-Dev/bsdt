@@ -1,6 +1,6 @@
 <?php
 include('../layout.php');
-head();
+head("Submit Scan");
 
     include "scripts/php/fnc.myFunctions.php";
     include "scripts/php/fnc.progSpecific.php";
@@ -9,7 +9,7 @@ head();
 ?>
 	<div class="contentContainer center">
 		<div class="mainContent ui-corner-all textCenter center dropShadow" id="reportContainer">
-			<div class="textRight" style="position: absolute; top: 10px; right: 15px;"><span class="alert"><?php echo $_SESSION['currentVersion']; ?></span></div>
+			<div class="textRight" style="position: absolute; top: 10px; right: 15px;"><span class="alert"><?php echo SYSTEM_VERSION; ?></span></div>
 
 			<div style="width: 100%;" class="textLeft">
 				<h3>Submit Scan</h3>

@@ -143,14 +143,6 @@ div.ajaxLoading {
 	z-index: 10;
 }
 
-div.menuHeader {
-	width: 150px;
-	height: 30px;
-	font-size: 14px;
-	font-weight: bold;
-	color: #FFF;
-	background-color: #111111;
-}
 
 div.menuSection {
 	margin-top: 5px;
@@ -311,8 +303,13 @@ span.enemy { color: #FF0000; }
 span.alert { color: #FF0; }
 
 span.menuHeader {
-	margin-left: 35px;
-	line-height: 30px;
+	width: 150px;
+	margin-left: 20px;
+	font-size: 14px;
+	line-height: 20px;
+	font-weight: bold;
+	color: #FFF;
+	text-align: center;
 }
 
 span.inlineEditSpan {
@@ -437,7 +434,7 @@ h3 {
 h4 { margin: 0px; }
 
 hr {
-	width: 80%;
+	width: 90%;
 	height: 1px;
 	background: #8A0707;
 	border: 0px;

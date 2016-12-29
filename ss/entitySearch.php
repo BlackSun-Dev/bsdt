@@ -1,8 +1,12 @@
 <?php
 include('../layout.php');
-head();
+head("Entity Search");
 
-if (isset($_SESSION['userPermissions']['report']) == 1) {
+$users = new User;
+$permissionLevel = isset($_SESSION['userId']) ? $users->getPermissionLevel($_SESSION['userId']) : null;
+$mysqli = Database::getInstance();
+
+	if ($permissionLevel >= 4) {
   $_POST['searchPanel'] = 1;
 
   $ownerList = '<option value="none">Owner Name</option>';
@@ -20,9 +24,9 @@ if (isset($_SESSION['userPermissions']['report']) == 1) {
 
   $querySystemsList = '';
 
-  if ($_SESSION['userPermissions']['owner'] == 1 || $_SESSION['userPermissions']['admin'] == 1) {
-    $stmt = $mysqli -> prepare("SELECT `system`, `years` FROM `changesbasic`");
-    echo $mysqli -> error;
+  if ($permissionLevel >= 5) {
+    $stmt = $mysqli->prepare("SELECT `system`, `years` FROM `changesbasic`");
+    echo $mysqli->error;
 
     $stmt -> execute();
     $stmt -> store_result();
@@ -51,8 +55,8 @@ if (isset($_SESSION['userPermissions']['report']) == 1) {
     }
 
   } else {
-    $stmt = $mysqli -> prepare("SELECT `Systems` FROM `groups` WHERE `GroupID` = ?");
-    echo $mysqli -> error();
+    $stmt = $mysqli->prepare("SELECT `Systems` FROM `groups` WHERE `GroupID` = ?");
+    echo $mysqli->error();
 
     $stmt -> bind_param('i', $_SESSION['userGroup']);
     $stmt -> execute();
@@ -97,11 +101,11 @@ if (isset($_SESSION['userPermissions']['report']) == 1) {
 
 <div class="contentContainer center">
   <div class="mainContent ui-corner-all dropShadow center textLeft">
-    <div class="textCenter" style="position: absolute; top: 10px; right: 15px;"><span class="alert"><?php echo $_SESSION['currentVersion']; ?></span></div>
+    <div class="textCenter" style="position: absolute; top: 10px; right: 15px;"><span class="alert"><?php echo SYSTEM_VERSION; ?></span></div>
     <h3>Entity Search</h3>
     <hr class="left">
     <div id="reportContainer" class="textCenter">
-      <?php if (isset($_SESSION['userPermissions']['groupAdmin']) == 1) { ?>
+      <?php if (($permissionLevel >= 4)) { ?>
         <div id="blockContainer" style="float: left; width: 35%" class="textCenter">
           <h4>Select Filters</h4>
           <hr>

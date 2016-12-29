@@ -1,6 +1,6 @@
 <?php
 include('../layout.php');
-head();
+head("Prospect Manager");
 
  ?>
  <div class="contentContainer center">

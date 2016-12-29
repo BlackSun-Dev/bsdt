@@ -1,14 +1,14 @@
 <?php
-    require "scripts/php/req.conn.php";
+include('../layout.php');
+head("Group Management");
 
-    include "scripts/php/fnc.myFunctions.php";
-    include "scripts/php/fnc.progSpecific.php";
-    include "scripts/php/fnc.xml2Array.php";
-
-	if (isset($_SESSION['userPermissions']['admin']) == 1) {
+$users = new User;
+$permissionLevel = isset($_SESSION['userId']) ? $users->getPermissionLevel($_SESSION['userId']) : null;
+$mysqli = Database::getInstance();
+	if ($permissionLevel >= 4) {
 	// Gets all the group information
-		$stmt = $mysqli -> prepare("SELECT `GroupID`, `GroupName`, `Systems` FROM `groups`");
-			echo $mysqli -> error;
+		$stmt = $mysqli->prepare("SELECT `GroupID`, `GroupName`, `Systems` FROM `groups`");
+			echo $mysqli-> error;
 		$stmt -> execute();
 		$stmt -> store_result();
 		$stmt -> bind_result($groupID, $groupName, $systems);
@@ -37,22 +37,14 @@
 
 		$groupList .= '</table>';
 	}
-
-	include "../lib/style/header.php";
-?>
-
-<body>
-	<?php
-		include "/menu.php";
-		include "lib/style/logo.php";
 	?>
 
 	<div class="contentContainer center">
 		<div class="mainContent ui-corner-all dropShadow center textLeft">
-			<div class="textCenter" style="position: absolute; top: 10px; right: 15px;"><span class="alert"><?php echo $_SESSION['currentVersion']; ?></span></div>
+			<div class="textCenter" style="position: absolute; top: 10px; right: 15px;"><span class="alert"><?php echo SYSTEM_VERSION; ?></span></div>
 			<h3>Group Management</h3>
 			<hr class="left">
-		<?php if (isset($_SESSION['userPermissions']['admin']) == 1) { ?>
+		<?php if ($permissionLevel >= 4) { ?>
 			<div style="float: left; width: 35%" class="textCenter">
 				<div class="textLeft" style="width: 100%">New Group</div>
 				<hr>

@@ -1,27 +1,18 @@
 <?php
-    require "scripts/php/req.conn.php";
+include('../layout.php');
+head();
 
-    include "scripts/php/fnc.myFunctions.php";
-    include "scripts/php/fnc.progSpecific.php";
-    include "scripts/php/fnc.xml2Array.php";
+$users = new User;
+$permissionLevel = isset($_SESSION['userId']) ? $users->getPermissionLevel($_SESSION['userId']) : null;
 
-// RAW PHP HERE
-
-	include "../lib/style/header.php";
 ?>
-
-<body>
-	<?php
-		include "/menu.php";
-		include "lib/style/logo.php";
-	?>
 
 	<div class="contentContainer center">
 		<div class="mainContent ui-corner-all dropShadow center textLeft">
-			<div class="textCenter" style="position: absolute; top: 10px; right: 15px;"><span class="alert"><?php echo $_SESSION['currentVersion']; ?></span></div>
+			<div class="textCenter" style="position: absolute; top: 10px; right: 15px;"><span class="alert"><?php echo SYSTEM_VERSION; ?></span></div>
 			<h3>Scrub Database</h3>
 			<hr class="left">
-		<?php if (isset($_SESSION['userPermissions']['owner']) == 1) { ?>
+		<?php if ($permissionLevel >= 5) { ?>
 			<div style="float: left; width: 35%" class="textCenter">
 				<div class="textLeft" style="width: 100%">Note:</div>
 				<hr>
@@ -55,8 +46,6 @@
 				<br>
 				<button id="searchSubmit" class="button ui-corner-all dropShadow center" onClick="scrub();">Scrub</button><br /><br />
 			</div>
-
-			<hr>
 
 			<div id="reportContainer" class="textCenter"></div>
 		<?php } else { ?>
