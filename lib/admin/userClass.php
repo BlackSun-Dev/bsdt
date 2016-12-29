@@ -47,7 +47,6 @@ class User {
   }
 
   function getPermissionLevel($userId){
-    $query = $this->db->stmt_init();
     $query = $this->db->prepare("SELECT userLevel from users WHERE userId=?");
     $query -> bind_param("i", $userId);
     $query -> execute();
@@ -70,23 +69,17 @@ class User {
 
   function login($username, $password){
     $password = md5('prefix' . md5($password) . 'suffix');
-    $query = $this->db->stmt_init();
-    if($query -> prepare("SELECT `IndexNo` FROM `users` WHERE `Username`=? && `Password`=?")){
-    $query -> bind_param("ss", $username, $password);
-    $query -> execute();
-    $query -> bind_result($userId);
-    $query -> store_result();
-      if($query->num_rows == 1){
-        $query -> fetch();
-        session_start();
-          $_SESSION['username'] = $username;
-          $_SESSION['userId'] = $userId;
-        session_write_close();
-      }
-    }
-    else {
-      return null;
-    }
+    $query = $this->db->prepare("SELECT * FROM `users` WHERE `userHandle`=? && `userPass`=?");
+    $query->bind_param("ss", $username, $password);
+    $query->execute();
+    $result = $query->get_result();
+    $row = $result->fetch_assoc();
+    session_start();
+    $_SESSION['username'] = $row['userHandle'];
+    $_SESSION['userId'] = $row['userId'];
+    $_SESSION['userGroup'] = $row['userGroup'];
+    $_SESSION['userLevel'] = $row['userLevel'];
+    session_write_close();
   }
 
   function permissionIndex($permissionIndex){
@@ -97,9 +90,9 @@ class User {
       "Consiglio" => 3,
       "Vigo" => 4,
       "Throne" => 5,
-      );
+    );
 
-      return $type[$permissionIndex];
+    return $type[$permissionIndex];
   }
 }
 

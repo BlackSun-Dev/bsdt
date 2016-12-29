@@ -1,5 +1,5 @@
 <?php
-class SystemClass {
+class System {
 
   public $db;
 

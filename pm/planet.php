@@ -1,9 +1,5 @@
 <?php
-    require "lib/autoloader.php";
-
-    include "../lib/style/header.php";
-    include "..//menu.php";
-    include "../lib/style/logo.php";
+include("../layout.php");
 
 $planets = new Planet;
 $deposits = new Deposit;
@@ -123,5 +119,5 @@ $planetId = isset($_REQUEST['id']) ? $_REQUEST['id'] : null;
           }
         });
         </script>
-        
+
 <?php include "../lib/style/footer.php"; ?>
