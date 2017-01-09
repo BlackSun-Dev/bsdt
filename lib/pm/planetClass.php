@@ -1,285 +1,75 @@
 <?php
 
 class Planet {
+    private $id;
+    private $name;
+    private $size;
+    private $system;
 
-  public $db;
+    public function __set($name, $value) {}
 
-  private $planetId;
-  private $planetLocation;
-  private $planetName;
-  private $planetSize;
-  private $planetSystem;
+    public static function get($id) {
+        $db = Database::getInstance();
 
-  function __construct(){
-    $this->db = Database::getInstance();
-  }
-
-  function addPlanet($planetLocation,$planetName,$planetSize,$planetType,$systemId){
-    if(!self::checkPlanetLocation($planetLocation,$systemId)){
-      $query = $this->db->prepare("INSERT INTO planets WHERE planetLocation = :planetLocation and planetSize= :planetSize and planetType=:planetType and systemId= :systemId");
-      $query -> bind_param(":planetLocation", $planetLocation);
-      $query -> bind_param(":planetSize", $planetSize);
-      $query -> bind_param(":planetType", $planetType);
-      $query -> bind_param(":systemId", $systemId);
-      $query -> execute();
-      $query -> close();
-    }
-  }
-
-  function checkPlanet($planetId){
-    $query = $this->db->prepare("SELECT * FROM planets WHERE planetId=?");
-    $query -> bind_param("i", $planetId);
-    $query -> execute();
-    $query -> store_result();
-    if($query->num_rows == 0){
-      return false;
-    }
-    return true;
-  }
-
-  function checkPlanetLocation($sysX,$sysY,$systemId){
-    $query = $this->db->prepare("SELECT * FROM deposits WHERE sysX=? AND sysY=? AND systemId=?");
-    $query -> bind_param("iii", $sysX, $sysY, $systemId);
-    $query -> execute();
-    $query -> store_result();
-    if($query->num_rows == 0){
-      return false;
-    }
-    return true;
-  }
-
-  function checkPlanetTerrain($planetId){
-    $query = $this->db->prepare("SELECT terrain FROM planets WHERE planetId=?");
-    $query -> bind_param("i", $planetId);
-    $query -> execute();
-    $result = $query ->get_result();
-    $row = $result->fetch_assoc();
-    if($row['terrain'] == ''){
-      return false;
-    }
-    return true;
-  }
-
-  function countPlanetDeposits($planetId){
-    if(self::checkPlanet($planetId)){
-      $query = $deposit->getDepositsPlanet($planetId);
-    }
-    return $query;
-  }
-
-  function deletePlanet($planetId){
-    if(self::checkPlanet($planetId)){
-      $query = $this->db->prepare("DELETE * FROM planets WHERE planetId=?");
-      $query -> bind_param("i",$planetId);
-      $query -> execute();
-      $query -> close();
-    }
-  }
-
-  function editPlanet(){
-
-  }
-
-  function getPlanets(){
-    $query = $this->db->query("SELECT * FROM planets ORDER BY systemId ASC, planetName ASC");
-    $result = array();
-    while($row = $query->fetch_assoc()){
-      $result[] = $row;
+        $query = $db->prepare("SELECT * FROM planets WHERE id = ?");
+        /*$query->execute([$id]);
+        return $query->fetchObject("Planet");*/
+        $query->bind_param("i", $id);
+        $query->execute();
+        $result = $query->get_result();
+        return $result->fetch_object("Planet");
     }
 
-    return $result;
-  }
+    public static function find($name) {
+        $db = Database::getInstance();
 
-  function getPlanetIdbyName($planetName){
-    $query = $this->db->prepare("SELECT planetId FROM planets WHERE planetName=?");
-    $query->bind_param("s",$planetName);
-    $query->execute();
-    return $query;
-  }
+        $query = $db->prepare("SELECT * FROM planets WHERE name = ?");
+        /*$query->execute([$name]);
+        if ($query->rowCount() != 0) {
+            return $query->fetchObject("Planet");
+        }*/
+        $query->bind_param("s", $name);
+        $query->execute();
+        if ($query->num_rows != 0) {
+            $result = $query->get_result();
+            return $result->fetch_object("Planet");
+        }
 
-  function getPlanetLocation($planetId){
-    $query = $this->db->prepare("SELECT sysX, sysY FROM planets WHERE planetId=?");
-    $query -> bind_param("i",$planetId);
-    $result = $query ->get_result();
-    $row = $result->fetch_assoc();
-    return $row['sysX'] . ", " . $row['sysY'];
-  }
-
-  function getPlanetName($planetId){
-    $query = $this->db->prepare("SELECT planetName FROM planets WHERE planetId=?");
-    $query -> bind_param("i",$planetId);
-    $query -> execute();
-    $result = $query ->get_result();
-    $row = $result->fetch_assoc();
-    return $row['planetName'];
-  }
-
-  function getPlanetSize($planetId){
-    $query = $this->db->prepare("SELECT planetSize FROM planets WHERE planetId=?");
-    $query -> bind_param("i",$planetId);
-    $query -> execute();
-    $result = $query ->get_result();
-    $row = $result->fetch_assoc();
-    return $row['planetSize'];
-  }
-
-  function getPlanetbySystem($systemId){
-    $query = $this->db->prepare("SELECT * FROM planets WHERE systemId=? ORDER BY planetName ASC");
-    $query -> bind_param("i",$systemId);
-    $query -> execute();
-    $result = $query->get_result();
-    while($row = $result->fetch_assoc()){
-      $rows[] = $row;
-    }
-    return $rows;
-  }
-
-  function getPlanetTerrain($planetId){
-    $query = $this->db->prepare("SELECT terrain FROM planets WHERE planetId=?");
-    $query -> bind_param("i",$planetId);
-    $query -> execute();
-    $result = $query ->get_result();
-    $row = $result->fetch_assoc();
-    return $row['terrain'];
-  }
-
-  function getPlanetTerrainName($plaX, $plaY, $planetId){
-    $typeIndex = (self::getPlanetSize($planetId) * $plaY) + $plaX;
-    $typeStr = substr(self::getPlanetTerrain($planetId), $typeIndex, 1);
-    $type = array(
-      "a" => "Cave",
-      "b" => "Crater",
-      "c" => "Desert",
-      "d" => "Forest",
-      "e" => "Gas Giant",
-      "f" => "Glacier",
-      "g" => "Grassland",
-      "h" => "Jungle",
-      "i" => "Mountain",
-      "j" => "Ocean",
-      "k" => "River",
-      "l" => "Rock",
-      "m" => "Swamp",
-      "n" => "Volcanic");
-      return $type[$typeStr];
+        return new self();
     }
 
-    function getTerrainName($terrain){
-      $type = array(
-        "a" => "Cave",
-        "b" => "Crater",
-        "c" => "Desert",
-        "d" => "Forest",
-        "e" => "Gas Giant",
-        "f" => "Glacier",
-        "g" => "Grassland",
-        "h" => "Jungle",
-        "i" => "Mountain",
-        "j" => "Ocean",
-        "k" => "River",
-        "l" => "Rock",
-        "m" => "Swamp",
-        "n" => "Volcanic");
-        return $type[$terrain];
-      }
+    public static function createPlanet($name, $size, $system) {
+        $db = Database::getInstance();
 
-      function listTerrainName($terrainIndex){
-        $type = array(
-          "0" => "Cave",
-          "1" => "Crater",
-          "2" => "Desert",
-          "3" => "Forest",
-          "4" => "Gas Giant",
-          "5" => "Glacier",
-          "6" => "Grassland",
-          "7" => "Jungle",
-          "8" => "Mountain",
-          "9" => "Ocean",
-          "10" => "River",
-          "11" => "Rock",
-          "12" => "Swamp",
-          "13" => "Volcanic");
-          return $type[$terrainIndex];
+        $insert = $db->query("INSERT INTO planets VALUES (NULL, ?, ?, ?)");
+        /*$insert->execute([$name, $size, $system]);
+        if ($insert) {
+            $id = $db->lastInsertId();
+            return self::get($id);
+        }*/
+        $insert->bind_param("sii", $name, $size, $system);
+        $insert->execute();
+        if ($insert) {
+            $id = $insert->insert_id;
+            return self::get($id);
         }
 
-      function getTerrainCode($terrain){
-        $type = array(
-          "Cave" => "a",
-          "Crater" => "b",
-          "Desert" => "c",
-          "Forest" => "d",
-          "Gas Giant" => "e",
-          "Glacier" => "f",
-          "Grassland" => "g",
-          "Jungle" => "h",
-          "Mountain" => "i",
-          "Ocean" => "j",
-          "River" => "k",
-          "Rock" => "l",
-          "Swamp" => "m",
-          "Volcanic" => "n");
-          return $type[$terrain];
-        }
+        return new self();
+    }
 
-        function getPlanetType($planetId){
-          $query = $this->db->prepare("SELECT planetType FROM planets WHERE planetId=?");
-          $query -> bind_param("i",$planetId);
-          $query -> execute();
-          return $query;
-        }
+    public function getId() {
+        return $this->id;
+    }
 
-        function setPlanetLocation($planetId, $statement){
-          if(self::checkPlanet($planetId)){
-            $query = $this->db->prepare("UPDATE planets SET planetLocation =? WHERE planetId=?");
-            $query -> bind_param("si",$statement, $planetId);
-            $query -> execute();
-            $query -> close();
-          }
-        }
+    public function getName() {
+        return $this->name;
+    }
 
-        function setPlanetName($planetId, $statement){
-          if(self::checkPlanet($planetId)){
-            $query = $this->db->prepare("UPDATE planets SET planetName=? WHERE planetId=?");
-            $query -> bind_param("si",$statement, $planetId);
-            $query -> execute();
-            $query -> close();
-          }
-        }
+    public function getSize() {
+        return $this->size;
+    }
 
-        function setPlanetSize($planetId, $statement){
-          if(self::checkPlanet($planetId)){
-            $query = $this->db->prepare("UPDATE planets SET planetSize=? WHERE planetId=?");
-            $query -> bind_param("ii",$statement, $planetId);
-            $query -> execute();
-            $query -> close();
-          }
-        }
-
-        function setPlanetSystem($planetId, $systemId, $statement){
-          if(self::checkPlanet($planetId)){
-            $query = $this->db->prepare("UPDATE planets SET systemId=? WHERE planetId=?");
-            $query -> bind_param("ii",$statement, $planetId);
-            $query -> execute();
-            $query -> close();
-          }
-        }
-
-        function setPlanetTerrain($planetId, $statement){
-          if(self::checkPlanet($planetId)){
-            $query = $this->db->prepare("UPDATE planets SET terrain=? WHERE planetId=?");
-            $query -> bind_param("si",$statement, $planetId);
-            $query -> execute();
-            $query -> close();
-          }
-        }
-
-        function setPlanetType($planetId, $statement){
-          if(self::checkPlanet($planetId)){
-            $query = $this->db->prepare("UPDATE planets SET planetType=? WHERE planetId=?");
-            $query -> bind_param("si",$statement, $planetId);
-            $query -> execute();
-            $query -> close();
-          }
-        }
-      }
-      ?>
+    public function getSystem() {
+        return System::get($this->system)->getName();
+    }
+}

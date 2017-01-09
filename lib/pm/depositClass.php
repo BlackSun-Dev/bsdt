@@ -1,206 +1,104 @@
 <?php
 
 class Deposit {
+    private $db;
 
-  public $db;
+    private $id;
+    private $amount;
+    private $rm;
+    private $planet;
+    private $terrain;
+    private $x;
+    private $y;
 
-  private $depositId;
-  private $plaX;
-  private $plaY;
-  private $depositSize;
-  private $depositType;
-  private $planetId;
+    /*public function __construct(){
+        $this->db = Database::getInstance();
+    }*/
 
-  function __construct(){
-    $this->db = Database::getInstance();
-  }
+    public function __set($name, $value) {}
 
-  function addDeposit($plaX, $plaY, $depositSize, $depositType, $planetId){
-    if(!self::checkDepositLocation($plaX, $plaY, $planetId)){
-      $query = $this->db->prepare("INSERT INTO deposits (plaX, plaY, depositSize, depositType, planetId) VALUES(?, ?, ?, ?, ?)");
-      $query -> bind_param("iiiii", $plaX, $plaY, $depositSize, $depositType, $planetId);
-      $query -> execute();
-      $query -> close();
-    }
-  }
+    public function get($id) {
+        $db = Database::getInstance();
 
-  function checkDeposit($depositId){
-    $query = $this->db->prepare("SELECT * FROM deposits WHERE depositId=?");
-    $query -> bind_param("i", $depositId);
-    $query -> execute();
-    $query -> store_result();
-    if($query->num_rows == 0){
-      return false;
-    }
-    return true;
-  }
-
-  function checkDepositbyPlanet($planetId){
-    $query = $this->db->prepare("SELECT * FROM deposits WHERE planetId=?");
-    $query -> bind_param("i", $planetId);
-    $query -> execute();
-    $query -> store_result();
-    if($query->num_rows == 0){
-      return false;
-    }
-    return true;
-  }
-
-  function checkDepositLocation($plaX, $plaY, $planetId){
-    $query = $this->db->prepare("SELECT * FROM deposits WHERE plaX=? AND plaY=? AND planetId=?");
-    $query -> bind_param("iii", $plaX, $plaY, $planetId);
-    $query -> execute();
-    $query -> store_result();
-    if($query->num_rows == 0){
-      return false;
-    }
-    return true;
-  }
-
-
-  function deleteDeposit($depositId){
-    if(self::checkDeposit($depositId)){
-      $query = $this->db->prepare("DELETE * FROM deposits WHERE depositId=?");
-      $query -> bind_param("i", $depositId);
-      $query -> execute();
-      $query -> close();
-    }
-  }
-
-  function editDeposit($depositId, $option, $statement){
-    if($option == "location"){
-      setplaX($depositId,$statement);
-    }
-    elseif ($option == "size") {
-      setDepositSize($depositId,$statement);
-    }
-    elseif($option == "type"){
-      setDepositType($depositId,$statement);
-    }
-  }
-
-  function getDepositLocation($depositId){
-    if(self::checkDeposit($depositId)){
-      $query = $this->db->prepare("SELECT plaX, plaY FROM deposits WHERE depositId=?");
-      $query -> bind_param("i", $depositId);
-      $query -> execute();
-      return $query;
-    }
-  }
-
-  function getDepositByLocation($plaX, $plaY, $planetId){
-    $query = $this->db->prepare("SELECT * FROM deposits WHERE plaX=? AND plaY=? AND planetId=?");
-    $query -> bind_param("iii", $plaX, $plaY, $planetId);
-    $query -> execute();
-    $result = $query ->get_result();
-    $row = $result->fetch_assoc();
-    return $row;
-  }
-
-  function getDepositsPlanet($planetId){
-    if(self::checkDepositbyPlanet($planetId)){
-      $query = $this->db->prepare("SELECT * FROM deposits WHERE planetId=? ORDER BY plaX ASC, plaY ASC");
-      $query -> bind_param("i",$planetId);
-      $query -> execute();
-      $result = $query->get_result();
-      while($row = $result->fetch_assoc()){
-        $rows[] = $row;
-      }
-      return $rows;
-    }
-    else return null;
-  }
-
-  function getDepositSize($depositId){
-    if(self::checkDeposit($depositId)){
-      $query = $this->db->prepare("SELECT depositSize FROM deposits WHERE depositId=?");
-      $query -> bind_param("i", $depositId);
-      $query -> execute();
-      $result = $query ->get_result();
-      $row = $result->fetch_assoc();
-      return $row['depositSize'];
-    }
-  }
-
-  function getDepositType($depositId){
-    if(self::checkDeposit($depositId)){
-      $query = $this->db->prepare("SELECT depositType FROM deposits WHERE depositId=?");
-      $query -> bind_param("i", $depositId);
-      $query -> execute();
-      $result = $query ->get_result();
-      $row = $result->fetch_assoc();
-      return $row['depositType'];
-    }
-  }
-
-  function getTypeName($typeIndex){
-    $type = array(
-      "0" => "Quantum",
-      "1" => "Meleenium",
-      "2" => "Ardanium",
-      "3" => "Rudic",
-      "4" => "Ryll",
-      "5" => "Duracrete",
-      "6" => "Alazhi",
-      "7" => "Laboi",
-      "8" => "Adegan",
-      "9" => "Rockivory",
-      "10" => "Tibannagas",
-      "11" => "Nova",
-      "12" => "Varium",
-      "13" => "Varmigio",
-      "14" => "Lommite",
-      "15" => "Hibridium",
-      "16" => "Durelium",
-      "17" => "Lowickan",
-      "18" => "Vertex",
-      "19" => "Berubian",
-      "20" => "Bacta");
-
-      return $type[$typeIndex];
+        $query = $db->prepare("SELECT * FROM deposits WHERE id = ?");
+        /*$query->execute([$id]);
+        return $query->fetchObject("Deposit");*/
+        $query->bind_param("i", $id);
+        $query->execute();
+        $result = $query->get_result();
+        return $result->fetch_object("Deposit");
     }
 
-    /*
-    * Determine the probability of finding a deposit on a certain terrain.
-    * args: $terrainType, $depositType
-    * return: $probability
-    */
+    public static function findDeposit($planet, $x, $y) {
+        $db = Database::getInstance();
 
-    function getTypeRarity(){
+        $query = $db->prepare("SELECT * FROM deposits WHERE planet = ? AND x = ? AND y = ?");
+        /*$query->execute([$planet, $x, $y]);
+        if ($query->rowCount() != 0) {
+            return $query->fetchObject("Deposit");
+        }*/
+        $query->bind_param("iii", $planet, $x, $y);
+        $query->execute();
+        if ($query->num_rows != 0) {
+            $result = $query->get_result();
+            return $result->fetch_object("Deposit");
+        }
+
+        return new self();
+    }
+
+    public static function createDeposit($amount, $rm, $planet, $terrain, $x, $y) {
+        $db = Database::getInstance();
+
+        $insert =  $db->prepare("INSERT INTO deposits VALUES (NULL, ?, ?, ?, ?, ?, ?)");
+        /*$insert->execute([$amount, $rm, $planet, $terrain, $x, $y]);
+        if ($insert) {
+            $id = $db->lastInsertId();
+            return self::get($id);
+        }*/
+        $insert->bind_param("iiiiii", $amount, $rm, $planet, $terrain, $x, $y);
+        $insert->execute();
+        if ($insert) {
+            $id = $insert->insert_id;
+            return self::get($id);
+        }
+
+        return new self();
+    }
+
+    public function editDeposit($amount, $rm, $planet, $terrain, $x, $y) {
 
     }
 
-    function setDepositLocation($depositId, $statement){
-      if(self::checkDeposit($depositId)){
-        $query = $this->db->prepare("UPDATE deposits SET plaX=?, plaY=? WHERE depositId=?");
-        $query -> bind_param("ii", $statement, $depositId);
-        $query -> execute();
-      }
+    public function getId() {
+        return $this->id;
     }
 
-    function setDepositPlanet($depositId, $statement){
-      if(self::checkDeposit($depositId)){
-        $query = $this->db->prepare("UPDATE deposits SET planetId=? WHERE depositId=?");
-        $query -> bind_param("ii", $statement, $depositId);
-        $query -> execute();
-      }
+    public function getAmount() {
+        return $this->amount;
     }
 
-    function setDepositSize($depositId, $statement){
-      if(self::checkDeposit($depositId)){
-        $query = $this->db->prepare("UPDATE deposits SET depositSize=? WHERE depositId=?");
-        $query -> bind_param("ii", $statement, $depositId);
-        $query -> execute();
-      }
+    public function getRM() {
+        return RM::get($this->rm)->getName();
     }
 
-    function setDepositType($depositId, $statement){
-      if(self::checkDeposit($depositId)){
-        $query = $this->db->prepare("UPDATE deposits SET depositType=? WHERE depositId=?");
-        $query -> bind_param("ii", $statement, $depositId);
-        $query -> execute();
-      }
+    public function getPlanet() {
+        return Planet::get($this->planet)->getName();
     }
-  }
 
-  ?>
+    public function getTerrain() {
+        return Terrain::get($this->terrain)->getName();
+    }
+
+    public function getX() {
+        return $this->x;
+    }
+
+    public function getY() {
+        return $this->y;
+    }
+
+    public function getCoordinates() {
+        return $this->x . ", " . $this->y;
+    }
+}
